@@ -7,6 +7,9 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
 
+# Global Variables
+BATCH_SIZE = 32
+
 
 # meth_tensor = torch.tensor(meth.values, dtype=torch.float32)
 def create_dataloader(X, y, batch_size = 32, shuffle = True):
@@ -27,13 +30,22 @@ X_train, y_train = train_df.drop("Sample_type", axis = 1), train_df["Sample_type
 X_test, y_test = test_df.drop("Sample_type", axis = 1), test_df["Sample_type"]
 
 
-BATCH_SIZE = 32
-train_dataloader = create_dataloader(X = X_train,
-                                     y = y_train,
-                                     batch_size = BATCH_SIZE,
-                                     shuffle = True)
-test_dataloader = create_dataloader(X = X_test,
-                                    y = y_test,
-                                    batch_size = BATCH_SIZE,
-                                    shuffle = False)
 
+def pass_tabular_dataloader(
+    train_path: str = "./drive/MyDrive/BRCA/brca_data/Training_Early_Fused_data.csv",
+    test_path: str = "./drive/MyDrive/BRCA/brca_data/Testing_Early_Fused_data.csv",
+    batch_size: int = BATCH_SIZE
+):
+    """
+    Reads train/test CSVs and returns PyTorch DataLoaders.
+    """
+    train_df = pd.read_csv(train_path)
+    test_df = pd.read_csv(test_path)
+
+    X_train, y_train = train_df.drop("Sample_type", axis=1), train_df["Sample_type"]
+    X_test, y_test = test_df.drop("Sample_type", axis=1), test_df["Sample_type"]
+
+    train_dataloader = create_dataloader(X_train, y_train, batch_size=batch_size, shuffle=True)
+    test_dataloader = create_dataloader(X_test, y_test, batch_size=batch_size, shuffle=False)
+
+    return train_dataloader, test_dataloader
